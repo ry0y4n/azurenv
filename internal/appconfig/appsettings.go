@@ -1,4 +1,4 @@
-package cmd
+package appconfig
 
 type AppSettings struct {
 	Name  string `json:"name"`
