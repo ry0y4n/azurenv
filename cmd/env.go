@@ -106,6 +106,11 @@ func loadEnvFile(filename string) ([]string, map[string]string, error) {
 		key := strings.TrimSpace(trimmedLine[:splitIndex])
 		value := strings.TrimSpace(trimmedLine[splitIndex+1:])
 
+		// Remove surrounding quotes if present (' or ")
+		if len(value) > 1 && ((value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'')) {
+			value = value[1: len(value)-1]
+		}
+
 		// Add mapping
 		envMap[key] = value
 		keys = append(keys, key)
