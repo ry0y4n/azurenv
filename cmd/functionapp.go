@@ -15,6 +15,7 @@ import (
 var (
 	functionappName string
 	functionAppResourceGroup string
+	filePathForFunctionapp string
 )
 
 // functionappCmd represents the functionapp command
@@ -46,20 +47,84 @@ var listRemoteFunctionCmd  = &cobra.Command{
 
 		// Display key-value pairs
 		fmt.Printf("App Settings for Azure Functions '%s':\n", functionappName)
-		for _, s := range settings {
-			fmt.Printf("- %s = %s\n", s.Name, s.Value)
+		for i, s := range settings {
+			fmt.Printf("[%d] %s = %s\n", i+1, s.Name, s.Value)
 		}
 	},
 }
 
+var applyFunctionappCmd = &cobra.Command{
+	Use: "apply",
+	Short: "Apply local .env settings to an Azure Functions",
+	Long: "Read a local .env file and apply all key-value pairs to the specified Azure Functions",
+	Run: func(cmd *cobra.Command, args []string) {
+		// Load local .env file
+		keys, envMap, err := loadEnvFile(filePathForFunctionapp)
+		if err != nil {
+			log.Fatalf("[ERROR] Failed to load %s: %v\n", filePathForFunctionapp, err)
+		}
+		
+		if len(keys) == 0 {
+			log.Println("[WARN] No environment variables found in", filePathForFunctionapp)
+			return
+		}
+
+		// Prepare arguments
+		var settingsArgs []string
+		for _, k := range keys {
+			v := envMap[k]
+			if k == "" {
+				continue
+			}
+			arg := fmt.Sprintf("%s=%s", k, v)
+			settingsArgs = append(settingsArgs, arg)
+		}
+
+		// Build the Azure CLI command
+		azArgs := []string{
+			"functionapp", "config", "appsettings", "set",
+			"--name", functionappName,
+			"--resource-group", functionAppResourceGroup,
+			"--settings",
+		}
+		azArgs = append(azArgs, settingsArgs...)
+
+		cmdAz := exec.Command("az", azArgs...)
+		out, err := cmdAz.Output()
+		if err != nil {
+			log.Fatalf("[ERROR] Failed to run az command:\n%v\nOutput:%s", err, string(out))
+		}
+
+		// Parse JSON output
+		var updated []AppSettings
+		if err := json.Unmarshal(out, &updated); err != nil {
+			log.Fatalf("[ERROR] Failed to parse JSON output: %v\nOutput: %s", err, string(out))
+		}
+
+		// Display success message
+		fmt.Printf("Successfully applied %d keys to App Functions '%s':\n", len(settingsArgs), functionappName)
+		for i, pair := range settingsArgs {
+			fmt.Printf("[%d] %s\n", i+1, pair)
+		}
+ 	},
+}
+
+
 func init() {
 	rootCmd.AddCommand(functionappCmd)
-	functionappCmd.AddCommand(listRemoteFunctionCmd )
+	functionappCmd.AddCommand(listRemoteFunctionCmd)
+	functionappCmd.AddCommand(applyFunctionappCmd)
 
 	// Flags for list-remote command
-	listRemoteFunctionCmd .Flags().StringVarP(&functionappName, "name", "n", "", "Name of the Azure App Service")
+	listRemoteFunctionCmd .Flags().StringVarP(&functionappName, "name", "n", "", "Name of the Azure App Functions")
 	listRemoteFunctionCmd .Flags().StringVarP(&functionAppResourceGroup, "resource-group", "g", "", "Resource group of the Azure App Service")
-
 	listRemoteFunctionCmd .MarkFlagRequired("name")
 	listRemoteFunctionCmd .MarkFlagRequired("resource-group")
+
+	// Flags for apply command
+	applyFunctionappCmd.Flags().StringVarP(&functionappName, "name", "n", "", "Name of the Azure Functions")
+	applyFunctionappCmd.Flags().StringVarP(&functionAppResourceGroup, "resource-group", "g", "", "Resource group of the Azure Functions")
+	applyFunctionappCmd.Flags().StringVarP(&filePathForFunctionapp, "file", "f", ".env", "Path to the .env file")
+	applyFunctionappCmd.MarkFlagRequired("name")
+	applyFunctionappCmd.MarkFlagRequired("resource-group")
 }
