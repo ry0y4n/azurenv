@@ -83,3 +83,75 @@ func Apply(config appconfig.AppConfig) {
 		fmt.Printf("[%d] %s\n", i+1, pair)
 	}
 }
+
+func ShowDiff(config appconfig.AppConfig) {
+	// Load local .env file
+	keys, envMap, err := utils.LoadEnvFile(config.FilePath)
+	if err != nil {
+		log.Fatalf("[ERROR] Failed to laod %s: %v\n", config.FilePath, err)
+	}
+
+	// Get remote app settings
+	azCmd := exec.Command("az", "webapp", "config", "appsettings", "list",
+		"--name", config.AppName,
+		"--resource-group", config.ResourceGroup,
+	)
+	out, err := azCmd.Output()
+	if err != nil {
+		log.Fatalf("[ERROR] Failed to run 'az webapp config appsettings list': %v\n", err)
+	}
+
+	var remoteSettings []appconfig.AppSettings
+	if err := json.Unmarshal(out, &remoteSettings); err != nil {
+		log.Fatalf("[ERROR] Failed to parse JSOn: %v\n", err)
+	}
+
+	// Create a map of remote settings
+	remoteMap := make(map[string]string)
+	for _, rs := range remoteSettings {
+		remoteMap[rs.Name] = rs.Value
+	}
+
+	// Compare local and remote settings
+	added := []string{}
+	changed := []string{}
+	same := []string{}
+
+	for _, k := range keys {
+		localVal := envMap[k]
+		remoteVal, exists := remoteMap[k]
+		if !exists {
+			// Key is not present in remote settings
+			added = append(added, k)
+		} else {
+			// Key exists in remote settings
+			if localVal == remoteVal {
+				same = append(same, k)
+			} else {
+				changed = append(changed, k)
+			}
+		}
+	}
+
+	// Display diff
+	fmt.Printf("Comparing local %s with App Servie's app settings %s ...\n", config.FilePath, config.AppName)
+
+	if len(added) == 0 && len(changed) == 0 {
+		fmt.Println("No differences found!")
+		return
+	}
+
+	if len(added) > 0 {
+		fmt.Println("\n[ADD] The following keys exist locally but not in remote:")
+		for _, k := range added {
+			fmt.Printf(" + %s=%s\n", k, envMap[k])
+		}
+	}
+
+	if len(changed) > 0 {
+		fmt.Println("\n[CHANGE] The following keys have different values:")
+		for _, k := range changed {
+			fmt.Printf(" * %s: local=%q, remote=%q\n", k, envMap[k], remoteMap[k])
+		}
+	}
+}

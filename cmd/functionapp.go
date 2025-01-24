@@ -16,11 +16,11 @@ var functionAppConfig appconfig.AppConfig
 var functionappCmd = &cobra.Command{
 	Use:   "functionapp",
 	Short: "Manage Azure Azure Functions app settings",
-	Long: "List and update app settings for Azure Functions",
+	Long:  "List and update app settings for Azure Functions",
 }
 
-var listRemoteFunctionCmd  = &cobra.Command{
-	Use: "list-remote",
+var listRemoteFunctionCmd = &cobra.Command{
+	Use:   "list-remote",
 	Short: "List remote settings from an Azure Functions",
 	Run: func(cmd *cobra.Command, args []string) {
 		services.ListRemote(functionAppConfig)
@@ -28,25 +28,33 @@ var listRemoteFunctionCmd  = &cobra.Command{
 }
 
 var applyFunctionappCmd = &cobra.Command{
-	Use: "apply",
+	Use:   "apply",
 	Short: "Apply local .env settings to an Azure Functions",
-	Long: "Read a local .env file and apply all key-value pairs to the specified Azure Functions",
+	Long:  "Read a local .env file and apply all key-value pairs to the specified Azure Functions",
 	Run: func(cmd *cobra.Command, args []string) {
 		services.Apply(functionAppConfig)
- 	},
+	},
 }
 
+var diffFunctionappCmd = &cobra.Command{
+	Use:   "diff",
+	Short: "Show differences between local .env and Azure Functions app settings",
+	Run: func(cmd *cobra.Command, args []string) {
+		services.ShowDiff(functionAppConfig)
+	},
+}
 
 func init() {
 	rootCmd.AddCommand(functionappCmd)
 	functionappCmd.AddCommand(listRemoteFunctionCmd)
 	functionappCmd.AddCommand(applyFunctionappCmd)
+	functionappCmd.AddCommand(diffFunctionappCmd)
 
 	// Flags for list-remote command
-	listRemoteFunctionCmd .Flags().StringVarP(&functionAppConfig.AppName, "name", "n", "", "Name of the Azure App Functions")
-	listRemoteFunctionCmd .Flags().StringVarP(&functionAppConfig.ResourceGroup, "resource-group", "g", "", "Resource group of the Azure App Service")
-	listRemoteFunctionCmd .MarkFlagRequired("name")
-	listRemoteFunctionCmd .MarkFlagRequired("resource-group")
+	listRemoteFunctionCmd.Flags().StringVarP(&functionAppConfig.AppName, "name", "n", "", "Name of the Azure App Functions")
+	listRemoteFunctionCmd.Flags().StringVarP(&functionAppConfig.ResourceGroup, "resource-group", "g", "", "Resource group of the Azure App Service")
+	listRemoteFunctionCmd.MarkFlagRequired("name")
+	listRemoteFunctionCmd.MarkFlagRequired("resource-group")
 
 	// Flags for apply command
 	applyFunctionappCmd.Flags().StringVarP(&functionAppConfig.AppName, "name", "n", "", "Name of the Azure Functions")
@@ -54,4 +62,11 @@ func init() {
 	applyFunctionappCmd.Flags().StringVarP(&functionAppConfig.FilePath, "file", "f", ".env", "Path to the .env file")
 	applyFunctionappCmd.MarkFlagRequired("name")
 	applyFunctionappCmd.MarkFlagRequired("resource-group")
+
+	// Flags for diff command
+	diffFunctionappCmd.Flags().StringVarP(&functionAppConfig.AppName, "name", "n", "", "Name of the Azure Functions")
+	diffFunctionappCmd.Flags().StringVarP(&functionAppConfig.ResourceGroup, "resource-group", "g", "", "Resource group of the Azure Functions")
+	diffFunctionappCmd.Flags().StringVarP(&functionAppConfig.FilePath, "file", "f", ".env", "Path to the .env file")
+	diffFunctionappCmd.MarkFlagRequired("name")
+	diffFunctionappCmd.MarkFlagRequired("resource-group")
 }
