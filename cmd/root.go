@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -11,22 +10,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "azurenv",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	Short: "Manage environment variables for Azure Appservice / Azure Functions",
+	Long:  "azurenv is a CLI tool to manage environment variables both locally (.env) and on Azure Service / Azure Functions).",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello, World!")
+		fmt.Println("")
+		fmt.Println(`🚀 Welcome to azurenv CLI! 🌍
+
+_____  ______________ ________________________ ___________   ____
+/  _  \ \____    /    |   \______   \_   _____/ \      \   \ /   /
+/  /_\  \  /     /|    |   /|       _/|    __)_  /   |   \   Y   / 
+/    |    \/     /_|    |  / |    |   \|        \/    |    \     /  
+\____|__  /_______ \______/  |____|_  /_______  /\____|__  /\___/   
+		\/        \/                \/        \/         \/         
+		`)
+		fmt.Println("For detailed instructions, please vist:")
+		fmt.Println("  https://github.com/ry0y4n/azurenv")
+		fmt.Println("\nYou can also run 'azurenv --help' to see available commands and options.")
 	},
 }
 
@@ -50,5 +52,3 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-
