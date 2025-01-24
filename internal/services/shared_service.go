@@ -29,7 +29,7 @@ func ListRemote(config appconfig.AppConfig) {
 	// Display key-value pairs
 	fmt.Printf("App Settings for App Service '%s':\n", config.AppName)
 	for i, s := range settings {
-		fmt.Printf("[%d] %s = %s\n", i+1, s.Name, s.Value)
+		fmt.Printf("[%d] %s=%s\n", i+1, s.Name, s.Value)
 	}
 }
 
