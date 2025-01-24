@@ -9,12 +9,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	version = "dev"
+)
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show the version of azurenv CLI",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("azurenv CLI v0.0.1")
+		fmt.Printf("azurenv %s", version)
 	},
 }
 
