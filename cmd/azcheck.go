@@ -83,13 +83,4 @@ If you're not logged in, it suggests 'az login' and subscription set commands.`,
 
 func init() {
 	rootCmd.AddCommand(azcheckCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// azcheckCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// azcheckCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

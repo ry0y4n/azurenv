@@ -18,11 +18,11 @@ var envFile string
 var envCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Manage local .env file",
-	Long: "Subcommand for reading or handling local environment files.",
+	Long:  "Subcommand for reading or handling local environment files.",
 }
 
 var listCmd = &cobra.Command{
-	Use: "list",
+	Use:   "list",
 	Short: "List environment variables from a .env file",
 	Long: `Read a .env file and display its key-value pairs.
 You can specify the path with --file (default is ".env").`,
@@ -46,15 +46,4 @@ func init() {
 	envCmd.AddCommand(listCmd)
 
 	listCmd.Flags().StringVarP(&envFile, "file", "f", ".env", "Path to the .env file")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// envCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// envCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
