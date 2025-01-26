@@ -1,5 +1,7 @@
 # azurenv
 
+![](azurenv-demo.gif)
+
 **azurenv** is a CLI tool that helps you manage environment variables for Azure App Service and Azure Functions without needing to manually copy and paste `.env` content into the Azure Portal. By leveraging this CLI, you can apply your local environment variables to Azure with just a single command, saving time and reducing potential human errors.
 
 > Note: This CLI depends on the Azure CLI. Make sure you have the latest Azure CLI installed and are logged in (`az login`) before using azurenv.
@@ -125,8 +127,8 @@ Contributions are welcome! Please open an issue or submit a pull request if you 
 
 # Final Notes
 
-- Make sure you have a working `.env` file with the correct environment variables.
-- Always verify your Azure CLI login status with `azurenv azcheck`.
-- Use `diff` commands to preview changes before applying them to Azure. This helps prevent accidental overwrites.
+-   Make sure you have a working `.env` file with the correct environment variables.
+-   Always verify your Azure CLI login status with `azurenv azcheck`.
+-   Use `diff` commands to preview changes before applying them to Azure. This helps prevent accidental overwrites.
 
 Enjoy effortless environment variable management with **azurenv**!
